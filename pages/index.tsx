@@ -2,12 +2,14 @@ import Head from 'next/head'
 // import Image from 'next/image'
 import { League_Spartan } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
-import { VStack, Image, Box, Flex, Text } from '@chakra-ui/react'
+import { VStack, Image, Box, Flex, Text, HStack } from '@chakra-ui/react'
 import { getData } from '@/data/getData'
 import { lowongan } from '@/types'
 
 const league = League_Spartan({weight:['500','700'], subsets: ['latin'] })
-
+const Pills =({value}:{value:string}) =>{
+  return <Text bg="brand.bg" color="brand.darkCyan" p="5px" borderRadius="5px" lineHeight={1}>{value}</Text>
+}
 export default function Home({data}:{data:lowongan[]}) {
   return (
     <>
@@ -26,20 +28,40 @@ export default function Home({data}:{data:lowongan[]}) {
           <VStack w="100vw" h={{base:"100%", sm:"100vh"}} minH="100vh" bg="brand.bg">
             {
               data.map(item =>{
-                  return <Flex flexDir={{base:"column", sm:"row"}} key={item.id} bg="white">
-                      <Image src={item.logo} />
-                      <VStack>
-                        <Text color="brand.darkCyan">{item.company}</Text>
-                        <Text _hover={{color:"brand.darkCyan"}}>{item.position}</Text>
-                        <Flex justifyContent="space-between" color="brand.greyCyan">
-                          <Text>{item.postedAt}</Text>
-                          <Text>{item.contract}</Text>
-                          <Text>{item.location}</Text>
-                        </Flex>
-                      </VStack>
+                  return <Flex flexDir={{base:"column", sm:"row"}} key={item.id} 
+                  bg="white" w="950px" p="30px" justifyContent="space-between" >
                       <Flex>
-                        <Text bg="brand.bg" color="brand.darkCyan">{item.role}</Text>
+                        <Image src={item.logo} mr="30px" />
+                        <VStack justifyContent="left" alignItems="left">
+                          <Flex>
+                            <Text color="brand.darkCyan">{item.company}</Text>
+                            {item.new? 
+                              <Text ml="20px" color="white" bg="brand.darkCyan" 
+                                    borderRadius="25px"
+                                    fontSize="12px" lineHeight={1} p="5px">NEW!</Text>:<></> }
+                          </Flex>
+                          <Text _hover={{color:"brand.darkCyan"}}>{item.position}</Text>
+                          <Flex justifyContent="space-between" color="brand.greyCyan">
+                            <Text>{item.postedAt}</Text>
+                            <Text>{item.contract}</Text>
+                            <Text>{item.location}</Text>
+                          </Flex>
+                        </VStack>
                       </Flex>
+                      <HStack spacing="15px" float="right">
+                        <Pills value={item.role} />
+                        <Pills value={item.level} />
+                        {
+                          item.languages.map(val =>{
+                           return <Pills value={val} />
+                          })
+                        }
+                        {
+                          item.tools.map(val =>{
+                            return <Pills value={val} />
+                           })
+                        }
+                      </HStack>
                   </Flex>
               })
             }
