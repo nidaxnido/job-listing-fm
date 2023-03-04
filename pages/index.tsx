@@ -2,15 +2,46 @@ import Head from 'next/head'
 // import Image from 'next/image'
 import { League_Spartan } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
-import { VStack, Image, Box, Flex, Text, HStack } from '@chakra-ui/react'
+import { VStack, Image, Box, Flex, Text, HStack, Center, Square, Divider } from '@chakra-ui/react'
 import { getData } from '@/data/getData'
 import { lowongan } from '@/types'
+import { useState } from 'react'
 
 const league = League_Spartan({weight:['500','700'], subsets: ['latin'] })
-const Pills =({value}:{value:string}) =>{
-  return <Text bg="brand.bg" color="brand.darkCyan" p="5px" borderRadius="5px" lineHeight={1}>{value}</Text>
+const Pills =({value, click}:{value:string, click:()=>void}) =>{
+  return <Text bg="brand.bg" color="brand.darkCyan" 
+                p="5px" borderRadius="5px" lineHeight={1} 
+                _hover={{bg:"brand.darkCyan", color:"white", cursor:"pointer"}}
+                onClick={click}>{value}</Text>
 }
 export default function Home({data}:{data:lowongan[]}) {
+  const [isSearch, setIsSearch] = useState(false);
+  const [keyword, setKeyword] = useState<string[]>([]);
+
+  function clickItem(word:string){
+    // const temp = [...keyword, word];
+    if(!keyword.includes(word))
+    {
+      setKeyword([...keyword, word])
+    }
+    
+    setIsSearch(true)
+  }
+  function clearAll(){
+    setKeyword([]);
+    setIsSearch(false)
+  }
+  function clearItem(word:string){
+    // const temp = keyword.splice(keyword.indexOf(word),1)
+    // console.log(temp)
+    // console.log(keyword)
+    // setKeyword(keyword.splice(keyword.indexOf(word),1));
+    setKeyword(keyword.filter(val => val !== word))
+    if(keyword.length === 1) setIsSearch(false)
+    console.log(keyword)
+    console.log(keyword.length)
+
+  }
   return (
     <>
       <Head>
@@ -22,51 +53,113 @@ export default function Home({data}:{data:lowongan[]}) {
       <main className={league.className}>
         <Box bg="brand.bg" w="100%">
           <Box  w="100%" bg="brand.darkCyan">
-            <Image src="/images/bg-header-desktop.svg" w="100%" />  
+            <Image src="/images/bg-header-mobile.svg" w="100%" />  
+          </Box>
+          <Box w="100vw"  h="100%"  minH="100vh" 
+                  bg="brand.bg">
+            {
+              isSearch?
+              <Box w="100vw" pt="125px" display="block" position="fixed" top="0" left="0"
+                >
+              <Box bg="white" mx="auto"  w={{base:"320px", sm:"950px"}} minH="50px" 
+                    px="30px" py="15px" borderRadius="5px"
+                    boxShadow="0.5px 1px 30px 2px hsl(180, 29%, 50%)">
+                  <Flex justifyContent="space-between">
+                    <Flex>
+                      {
+                        keyword.map(word => {
+                          return <Flex key={word} mr="10px">
+                            <Text bg="brand.bg" color="brand.darkCyan" 
+                                p="5px" borderTopLeftRadius="5px" 
+                                borderBottomLeftRadius="5px" lineHeight={1.5}>{word}</Text>
+                            <Square size="34px" bg="brand.darkCyan" 
+                                  color="white"
+                                  borderTopRightRadius="5px" borderBottomRightRadius="5px"
+                                  _hover={{cursor:"pointer", bg:"brand.darkGreyCyan"}}
+                                  onClick={()=>clearItem(word)} >x</Square>
+                          </Flex>
+                        })
+                      }
+                    </Flex>
+                    <Text color="brand.drkGretCyan" 
+                        _hover={{cursor:"pointer", color:"brand.darkCyan", textDecor:"underline"}}
+                        onClick={()=>clearAll()}>Clear</Text>
+                  </Flex>
+              </Box>
+              </Box>
+              :<></>
+            }
+            <Box  w={{base:"320px", sm:"950px"}} mx="auto">
+              <VStack  py="65px"
+                    spacing="30px">
+                {
+                  data.filter(item=>{
+                    let temp:string[] = [item.role, item.level].concat(item.languages).concat(item.tools)
+                    // const temp = item.languages.concat(item.tools).push(item.role, item.level)
+                    if(isSearch){
+                      return (keyword.every(val => {return temp.includes(val)}))
+                    }else{
+                      return true;
+                    }
+
+                  }).map(item =>{
+                      return <Flex flexDir={{base:"column", sm:"row"}} key={item.id} 
+                      bg="white" w="100%" p="30px" pt={{base:"0", sm:"30px"}} 
+                      justifyContent="space-between" borderRadius="5px"
+                      _hover={{borderLeft:"5px solid ", borderColor:"brand.darkCyan"}} >
+                          <Flex flexDir={{base:"column", sm:"row"}}>
+                            <Image src={item.logo} w={{base:"50px", sm:"88px"}}
+                                   mr="30px" mt={{base:"-25px", sm:"0"}}  />
+                            <VStack justifyContent="left" alignItems="left">
+                              <Flex>
+                                <Text color="brand.darkCyan">{item.company}</Text>
+                                {item.new? 
+                                  <Box ml="20px" color="white" bg="brand.darkCyan" 
+                                        borderRadius="25px"
+                                        fontSize="12px" lineHeight={1} 
+                                        px="5px" pt="5px" p="5px" h="20px">NEW!</Box>:<></> }
+                                {item.featured? 
+                                  <Box ml="10px" color="white" bg="brand.darkGreyCyan" 
+                                        borderRadius="25px"
+                                        fontSize="12px" lineHeight={1} 
+                                        px="5px" pt="5px" p="5px" h="20px">FEATURED</Box>:<></> }
+                              </Flex>
+                              <Text _hover={{color:"brand.darkCyan",cursor:"pointer"}}>{item.position}</Text>
+                              <Flex justifyContent="space-between" color="brand.greyCyan">
+                                <Text>{item.postedAt}</Text>
+                                <Text lineHeight={1}>.</Text>
+                                <Text>{item.contract}</Text>
+                                <Text lineHeight={1}>.</Text>
+                                <Text>{item.location}</Text>
+                              </Flex>
+                            </VStack>
+                          </Flex>
+                          {/* <Divider color="brand.darkGreyCyan  "  mb="15px" mt="20px"  /> */}
+                          <HStack  float="right" flexWrap="wrap" gap="15px">
+                            <Pills value={item.role} click={()=>clickItem(item.role)} />
+                            <Pills value={item.level} click={()=>clickItem(item.level)} />
+                            {
+                              item.languages.map(val =>{
+                              return <Pills key={val} value={val} click={()=>clickItem(val)} />
+                              })
+                            }
+                            {
+                              item.tools.map(val =>{
+                                return <Pills key={val} value={val} click={()=>clickItem(val)} />
+                              })
+                            }
+                          </HStack>
+                      </Flex>
+                  })
+                }
+                
+              </VStack>
+
+              
+            </Box>
           </Box>
           
-          <VStack w="100vw" h={{base:"100%", sm:"100vh"}} minH="100vh" bg="brand.bg">
-            {
-              data.map(item =>{
-                  return <Flex flexDir={{base:"column", sm:"row"}} key={item.id} 
-                  bg="white" w="950px" p="30px" justifyContent="space-between" >
-                      <Flex>
-                        <Image src={item.logo} mr="30px" />
-                        <VStack justifyContent="left" alignItems="left">
-                          <Flex>
-                            <Text color="brand.darkCyan">{item.company}</Text>
-                            {item.new? 
-                              <Text ml="20px" color="white" bg="brand.darkCyan" 
-                                    borderRadius="25px"
-                                    fontSize="12px" lineHeight={1} p="5px">NEW!</Text>:<></> }
-                          </Flex>
-                          <Text _hover={{color:"brand.darkCyan"}}>{item.position}</Text>
-                          <Flex justifyContent="space-between" color="brand.greyCyan">
-                            <Text>{item.postedAt}</Text>
-                            <Text>{item.contract}</Text>
-                            <Text>{item.location}</Text>
-                          </Flex>
-                        </VStack>
-                      </Flex>
-                      <HStack spacing="15px" float="right">
-                        <Pills value={item.role} />
-                        <Pills value={item.level} />
-                        {
-                          item.languages.map(val =>{
-                           return <Pills value={val} />
-                          })
-                        }
-                        {
-                          item.tools.map(val =>{
-                            return <Pills value={val} />
-                           })
-                        }
-                      </HStack>
-                  </Flex>
-              })
-            }
-            
-          </VStack>
+          
         </Box>
         
       </main>
