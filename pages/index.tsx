@@ -112,7 +112,9 @@ export default function Home({data}:{data:lowongan[]}) {
                       bg="white" w="100%" p="30px" pt={{base:"0", sm:"30px"}} 
                       justifyContent="space-between" borderRadius="5px"
                       boxShadow="0.5px 1px 15px 0px hsl(180, 8%, 52%)"
-                      _hover={{borderLeft:"5px solid ", borderColor:"brand.darkCyan"}} >
+                      borderLeft={item.featured?"5px solid ":"0"}
+                      borderColor={item.featured? "brand.darkCyan": ""}
+                       >
                           <Flex flexDir={{base:"column", sm:"row"}}>
                             <Image src={item.logo} w={{base:"50px", sm:"88px"}}
                                    mr="30px" mt={{base:"-25px", sm:"0"}}  />
