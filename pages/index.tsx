@@ -6,6 +6,7 @@ import { VStack, Image, Box, Flex, Text, HStack, Center, Square, Divider } from 
 import { getData } from '@/data/getData'
 import { lowongan } from '@/types'
 import { useState } from 'react'
+import { useMediaQuery } from 'react-responsive'
 
 const league = League_Spartan({weight:['500','700'], subsets: ['latin'] })
 const Pills =({value, click}:{value:string, click:()=>void}) =>{
@@ -17,7 +18,7 @@ const Pills =({value, click}:{value:string, click:()=>void}) =>{
 export default function Home({data}:{data:lowongan[]}) {
   const [isSearch, setIsSearch] = useState(false);
   const [keyword, setKeyword] = useState<string[]>([]);
-
+  const isMobile  = useMediaQuery({query: '(max-width : 375px)'})
   function clickItem(word:string){
     // const temp = [...keyword, word];
     if(!keyword.includes(word))
@@ -53,7 +54,11 @@ export default function Home({data}:{data:lowongan[]}) {
       <main className={league.className}>
         <Box bg="brand.bg" w="100%">
           <Box  w="100%" bg="brand.darkCyan">
-            <Image src="/images/bg-header-mobile.svg" w="100%" />  
+            {isMobile? 
+            <Image src="/images/bg-header-mobile.svg" w="100%" />  :
+            <Image src="/images/bg-header-desktop.svg" w="100%" />  
+            }
+            
           </Box>
           <Box w="100vw"  h="100%"  minH="100vh" 
                   bg="brand.bg">
@@ -63,12 +68,12 @@ export default function Home({data}:{data:lowongan[]}) {
                 >
               <Box bg="white" mx="auto"  w={{base:"320px", sm:"950px"}} minH="50px" 
                     px="30px" py="15px" borderRadius="5px"
-                    boxShadow="0.5px 1px 30px 2px hsl(180, 29%, 50%)">
-                  <Flex justifyContent="space-between">
-                    <Flex>
+                    boxShadow="0.5px 1px 15px 0px hsl(180, 8%, 52%)">
+                  <Flex justifyContent="space-between" flexWrap="nowrap">
+                    <Flex flexWrap="wrap">
                       {
                         keyword.map(word => {
-                          return <Flex key={word} mr="10px">
+                          return <Flex key={word} mr="10px" mb="10px">
                             <Text bg="brand.bg" color="brand.darkCyan" 
                                 p="5px" borderTopLeftRadius="5px" 
                                 borderBottomLeftRadius="5px" lineHeight={1.5}>{word}</Text>
@@ -90,7 +95,7 @@ export default function Home({data}:{data:lowongan[]}) {
               :<></>
             }
             <Box  w={{base:"320px", sm:"950px"}} mx="auto">
-              <VStack  py="65px"
+              <VStack  py="65px" pt={isSearch? {base:"100px", sm:"65px"}:{base:"65px", sm:"50px"}}
                     spacing="30px">
                 {
                   data.filter(item=>{
@@ -106,6 +111,7 @@ export default function Home({data}:{data:lowongan[]}) {
                       return <Flex flexDir={{base:"column", sm:"row"}} key={item.id} 
                       bg="white" w="100%" p="30px" pt={{base:"0", sm:"30px"}} 
                       justifyContent="space-between" borderRadius="5px"
+                      boxShadow="0.5px 1px 15px 0px hsl(180, 8%, 52%)"
                       _hover={{borderLeft:"5px solid ", borderColor:"brand.darkCyan"}} >
                           <Flex flexDir={{base:"column", sm:"row"}}>
                             <Image src={item.logo} w={{base:"50px", sm:"88px"}}
@@ -134,7 +140,9 @@ export default function Home({data}:{data:lowongan[]}) {
                               </Flex>
                             </VStack>
                           </Flex>
-                          {/* <Divider color="brand.darkGreyCyan  "  mb="15px" mt="20px"  /> */}
+                          {isMobile? <Divider mb="20px" mt="10px" 
+                                              size="xl" borderColor="brand.darkGreyCyan"
+                                               />: <></>}
                           <HStack  float="right" flexWrap="wrap" gap="15px">
                             <Pills value={item.role} click={()=>clickItem(item.role)} />
                             <Pills value={item.level} click={()=>clickItem(item.level)} />
